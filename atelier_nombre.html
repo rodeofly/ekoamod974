@@ -158,7 +158,7 @@
   <script type="text/coffeescript">
   # On Dom Ready !   
   $ ->
-    
+    # Configuration des menus admin et user
     $( "#admin_help, #parametres" ).dialog
       autoOpen: false
       resizable: true
@@ -174,18 +174,18 @@
         at: "right bottom"
         of: "body"   
     
+    # Ouverture/fermeture du menu admin
     $( "#admin_help_opener" ).click () -> $( "#admin_help" ).dialog( "open" )  
     $( "#admin_help_closer" ).click () -> $( "#admin_help" ).dialog( "close" )  
-    
+    # Ouverture/fermeture du menu user
     $( "#param_opener" ).click () -> $( "#parametres" ).dialog( "open" )
     $( "#parametres_closer" ).click () -> $( "#parametres" ).dialog( "close" )
-      
+    # Gestion des checkbox du menu user
     $(' #checkbox_aide ').change () -> 
       if $(this).is(":checked")
         $( ".item" ).addClass( "aide" )
       else
         $( ".item" ).removeClass( "aide" )
-    
     $(' #checkbox_piege ').change () -> 
       if $(this).is(":checked")
         $( ".arobas" )
@@ -196,8 +196,6 @@
         $( ".arobas" )
           .draggable('disable')
           .removeClass( "carte" )
-    
-        
     $(' #checkbox_rotate ').change () -> 
       if $(this).is(":checked")
         $( "#panel, #panel_top, #panel_bottom" ).addClass( "rotate" )
@@ -214,7 +212,6 @@
       solution = parseInt($('#solution').val())
       
       # On parse le texte a la recherche des $ et des # qui symbolisent les items de chacun des membres de l'équation
-      
       text = $('#texte')
         .val()
         .replace(/#([0-9]*\??)/g, "<div class='carte diese'>$1</div>" )
@@ -223,7 +220,7 @@
       
       # On Fabrique un énoncé avec des elements (uniques) de chaque membre de l'équation draggables
       $('#enonce').prepend("<div class='enonce'>#{text}</div><button id='enonce_closer' class='closer'>x</button>")
-      
+      # Configuration de la boite de dialogue contenant l'énoncé
       $( "#enonce" ).dialog
         autoOpen: true
         width: "100%",
@@ -239,7 +236,7 @@
           of: "body" 
       $( "#enonce_opener" ).click () -> $( "#enonce" ).dialog( "open" )
       $( "#enonce_closer" ).click () -> $( "#enonce" ).dialog( "close" )
-     
+      # Les cartes de l'enoncé sont draggable et deviendront des items
       $('.carte').draggable
         revert: "invalid"
         helper: "clone"
@@ -247,13 +244,11 @@
         containement: "#panel"
         zIndex: 10000
 
-      
       # C'est au tour de l'utilisateur
       $( '#admin' ).hide()
       $( '#user' ).show()
 
-      # On active les deux panels et une poubelle droppable
-      
+      # On active les deux panels et une poubelle droppable      
       # Voila pour la poubelle
       $('#trash').droppable
         accept: ".item" 
@@ -264,7 +259,6 @@
         out: (event, ui) ->  $( ".ui-draggable-dragging" ).addClass( "carte" )
         drop: (event,ui) ->
           ui.draggable.remove()
-      
       # Voila pour les panels    
       $('#panel_top, #panel_bottom').droppable
         accept: ".carte" 
@@ -273,14 +267,7 @@
         drop: (event,ui) ->   
           # Un item est un élément deja droppé dans le panel auquel cas il passe juste d'un panel a l'autre
           if ui.draggable.hasClass("item")
-            #offset = $(this).offset();
-            #leftOffset = event.clientX - offset.left - $( ui.draggable ).width()/2;
-            #topOffset = event.clientY - offset.top + $(document).scrollTop() - $( ui.draggable ).height()/2;
             $(this).append( $( ui.draggable ) ) 
-            #$( ui.draggable ).css
-            #  left: leftOffset
-            #  top : topOffset
-               
           # Sinon on crée un nouvel item à partir du clone d'un élément
           else
             valeur = parseInt(ui.draggable.html())
@@ -295,8 +282,7 @@
             $(clone).css
               left: leftOffset
               top : topOffset
-
-          
+            # L'item crée doit devenir draggable
             $('.item').draggable
               revert: "invalid"
               cursor: "move"
@@ -320,8 +306,8 @@
           b = somme("#panel_bottom", ".diese")
         else
           t = somme("#panel_top", ".diese")
-          b = somme("#panel_bottom", ".dollar") 
-        
+          b = somme("#panel_bottom", ".dollar")
+        # Roulement de tambour, si tout est bien disposé et qu'il n'y a pas d'item piège alors c'est bon!  
         if t is b and t is total_membre and $( ".arobas.item" ).length is 0
           alert "bravo !"
         else
