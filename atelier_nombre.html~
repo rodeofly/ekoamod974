@@ -14,16 +14,26 @@
   body {
     margin:0;
     padding:0;
-    width: 100%;
-    text-align: center;
-    background: #622900;
+    width: 90%;
+    margin: auto;
+    border: solid black 0.2em;
+    background: #622900 fixed no-repeat center center url('planche_carton.jpg');
+    background-size: 100%;
+    
     color: #FCB08B;
     font-family: Ubuntu, sans-serif; 
     font-size : 20px;
-    position: relative;
+    text-align: center;    
     
   }
   
+  body.rotate {
+    width: 50%;
+    display: inline-block;
+    background: #622900 fixed no-repeat center center url('planche_carton.jpg');
+    background-size: 100%;
+  }
+
   #parametres, #admin_help, #enonce {
     background: black;
     color: white;  
@@ -42,16 +52,10 @@
     box-shadow: 0.02em 0.02em 0.02em 0.02em black;
   }
   
-  .menu  {
-    width:100%;
-    position: absolute;
-    top: 0px;
-    text-align: center;
+  #admin_menu, #user_menu  {
+    float:right;
+    padding-right: 0.5em;
     font-size: 3em;
-    #z-index:10000;
-  }
-  .menu_item{
-    display: inline-block;
   }
   
   .closer{
@@ -85,6 +89,7 @@
     border-radius: 0.2em;
     font-weight:bolder;
     color : white;
+    text-shadow: 1em #933D14;
   }
   
   .dollar.aide {
@@ -101,39 +106,35 @@
   
   .item{
     position : absolute;
-    width: 1.5em;
-    height: 1.5em;
-    line-height: 1.5em;
-    font-size: 4em;
-    text-shadow: 0.04em 0.04em black;
-    vertical-align: middle;
-    #z-index: 5000;
+    width: 1.33em;
+    height: 1.33em;
+    font-size: 2em;
+    z-index: 5000;
   }
   
   #panel {
-    margin: 0px;
-    padding: 0px;
-    width : 1228px;
-    height: 691px;
-    background: no-repeat center url('planche_carton.jpg');
-    background-size: 100%;
-    margin:auto;
+    position: absolute;
+    top: 0; bottom: 0; right: 0; left: 0;
   }
-  #panel.rotate {
-    background: no-repeat center url('planche_carton_portrait.jpg');
-    width: 691px;
-    height: 1228px;
-    margin:auto;
-  } 
-  #panel_top, #panel_bottom { 
-    width:100%;
-    height : 49%;   
+  
+  
+  #panel_top, #panel_bottom {
+    position: relative;
     display: block;
+    margin: auto;
+    width : 100%;
+    height : 48%;
+    
   }
+  
   #panel_top.rotate, #panel_bottom.rotate {
-    width : 49%;
-    height : 100%;
+    
+    position: relative;
+    top: 0; left: 0;
     display: inline-block;
+    width : 48%;
+    height : 100%;
+    
   }
   
   .panel.ui-droppable.ui-state-hover {
@@ -208,9 +209,9 @@
         
     $(' #checkbox_rotate ').change () -> 
       if $(this).is(":checked")
-        $( "#panel, #panel_top, #panel_bottom" ).addClass( "rotate" )
+        $( "#wrapper, #panel_top, #panel_bottom" ).addClass( "rotate" )
       else
-        $( "#panel, #panel_top, #panel_bottom" ).removeClass( "rotate" )
+        $( "#wrapper, #panel_top, #panel_bottom" ).removeClass( "rotate" )
  
   
     # C'est le tour de l'administrateur !
@@ -233,7 +234,7 @@
       $('#enonce').prepend("<div class='enonce'>#{text}</div><button id='enonce_closer' class='closer'>x</button>")
       
       $( "#enonce" ).dialog
-        autoOpen: true
+        autoOpen: false
         width: "100%",
         show: 
           effect: "blind"
@@ -265,11 +266,8 @@
       # Voila pour la poubelle
       $('#trash').droppable
         accept: ".item" 
-        greedy:true
         activeClass: "ui-state-hover"
         hoverClass: "ui-state-active"
-        over: (event, ui) -> $( ".ui-draggable-dragging" ).removeClass( "carte" )
-        out: (event, ui) ->  $( ".ui-draggable-dragging" ).addClass( "carte" )
         drop: (event,ui) ->
           ui.draggable.remove()
       
@@ -281,13 +279,13 @@
         drop: (event,ui) ->   
           # Un item est un élément deja droppé dans le panel auquel cas il passe juste d'un panel a l'autre
           if ui.draggable.hasClass("item")
-            #offset = $(this).offset();
-            #leftOffset = event.clientX - offset.left - $( ui.draggable ).width()/2;
-            #topOffset = event.clientY - offset.top + $(document).scrollTop() - $( ui.draggable ).height()/2;
+            offset = $(this).offset();
+            leftOffset = event.clientX - offset.left - $( ui.draggable ).width()/2;
+            topOffset = event.clientY - offset.top + $(document).scrollTop() - $( ui.draggable ).height()/2;
             $(this).append( $( ui.draggable ) ) 
-            #$( ui.draggable ).css
-            #  left: leftOffset
-            #  top : topOffset
+            $( ui.draggable ).css
+              left: leftOffset
+              top : topOffset
                
           # Sinon on crée un nouvel item à partir du clone d'un élément
           else
@@ -298,8 +296,9 @@
             if $( "#checkbox_aide" ).is(":checked")
               clone.addClass("aide")
             $(this).append clone
-            leftOffset = event.clientX - $( clone ).width()/2;
-            topOffset = event.clientY  - $( clone ).height()/2;
+            offset = $(this).offset();
+            leftOffset = event.clientX - offset.left - $( clone ).width()/2;
+            topOffset = event.clientY - offset.top + $(document).scrollTop() - $( clone ).height()/2;
             $(clone).css
               left: leftOffset
               top : topOffset
@@ -340,12 +339,12 @@
 <body>  
 
   <div id="admin">
-    <h1><br><br>Atelier Nombre</h1>
+    <h1>Atelier Nombre</h1>
     <div id="admin_menu" class="menu">
-      <div id="admin_help_opener"  class="menu_item">?</div>
-      <div id="go"                 class="menu_item">☑</div>
+      <div id="admin_help_opener">?</div>
+      <div id="go">☑</div>
     </div>
-    <textarea id="texte" rows="10" cols="80">
+    <textarea id="texte" rows="10" cols="50">
   Dans sa poche Chloé a @1 billet de #20€ et @3 pièces de #2€. A la librairie elle achète @1 livre à $7€ et @2 stylos à $3€.
   Combien d’argent lui reste-t-il $?
     </textarea><br>
@@ -364,16 +363,15 @@
   <div id="user">
     
     <div id="user_menu" class="menu">
-      <div id="param_opener"   class="menu_item">?</div>
-      <div id="enonce_opener"  class="menu_item">&#9776;</div>
-      <div id="trash"          class="menu_item">♽</div>
-      <div id="check"          class="menu_item">☑</div>
+      <div id="param_opener">?</div>
+      <div id="enonce_opener"> &#9776;</div>
+      <div id="trash">♽</div>
+      <div id="check">☑</div>
     </div>    
     
-
-    <div id="panel" class="">
-      <div id="panel_top" class="panel"></div>
-      <div id="panel_bottom" class="panel"></div>
+    <div id="panel">
+        <div id="panel_top" class="panel"></div>
+        <div id="panel_bottom" class="panel"></div>
     </div>
 
    
@@ -381,7 +379,7 @@
   <div id="parametres" title="Paramètres">
     <input type="checkbox" id="checkbox_aide" class="checkbox"  />Aide<br>
     <input type="checkbox" id="checkbox_piege" class="checkbox" checked/>Pièges<br>
-    <input type="checkbox" id="checkbox_rotate" class="checkbox"  />Tourner les planches<br>
+    <input type="checkbox" id="checkbox_rotate" class="checkbox" />Tourner les planches<br>
     <button id="parametres_closer" class="closer">x</button>
   
   </div>
