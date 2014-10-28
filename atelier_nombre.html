@@ -188,7 +188,7 @@
   # Fonction permettant d'inserer un exo dans l'enoncé
   choisir_exo = (id) ->
     $( ".carte" ).remove()
-    $( "#enonce" ).dialog( "close" )
+    $( "#enonce" ).dialog( "destroy" )
     exo = $( "##{id}" )
     membre = exo.data( "membre" )
     solution = exo.data( "solution" )
@@ -209,7 +209,7 @@
       appendTo: "#panel"
       containement: "#panel"
       zIndex: 10000
-    $( "#enonce" ).dialog( "open" )
+    $( "#enonce" ).dialog()
       
   # On Dom Ready !   
   $ ->
@@ -218,8 +218,6 @@
     # Configuration des boites de dialogue
     $( "#parametres, #enonce" ).dialog
       autoOpen: false
-      width: "50%"
-      height: 400
     # Ouverture/fermeture des boites de dialogue
     $( "#param_opener" ).click () -> 
       isOpen = $( " #parametres" ).dialog( "isOpen" )
