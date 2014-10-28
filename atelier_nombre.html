@@ -24,8 +24,9 @@
     background: #622900;
     color: #FCB08B;
     font-family: Ubuntu, sans-serif; 
-    font-size : 40px;
-    position: relative;   
+    font-size : 25px;
+    position: relative;  
+    overflow:auto; 
   }
   #user{
     width:100%;
@@ -72,7 +73,8 @@
     #z-index:10000;
   }
   .icon{
-    width:100%;
+    width:75%;
+    padding: 15%;
   }
   .menu_item {
     min-width: 10%;
@@ -101,6 +103,7 @@
   
   .carte {
     display: inline-block;
+    text-align: center;
     width: 1.25em;
     padding: 0.1em;
     border: 0.05em solid black; 
@@ -109,17 +112,18 @@
     font-weight:bolder;
     color : white;
   }
-  
+  .arobas {
+    display: inline-block;
+  }
   .item {
+    min-width:5%;
+    max-width: 5%;
+    min-height:10%;
+    max-height:10%;
     position : absolute;
     text-align: center;
-    width: 1.5em;
-    height: 1.5em;
-    line-height: 1.5em;
-    font-size: 2em;
     text-shadow: 0.04em 0.04em black;
-    vertical-align: middle;
-    #z-index: 5000;
+    box-shadow: 0em 0.025em 0.025em 0.025em black;
   }
   
   .dollar.aide {
@@ -305,7 +309,7 @@
       $( "#exercices" ).append(html)
     
     $( "#exercices" ).selectmenu
-      change: ( event, data ) -> choisir_exo( data.item.value ) 
+      select: ( event, data ) -> choisir_exo( data.item.value ) 
       width: 400  
       
   </script>
@@ -336,10 +340,7 @@
     
     <div id="enonce" title="Énoncé">Choisir un exercice !</div>
   </div>
-  
-  
-
-    
+   
   <div id="exo_1" class="exercice" data-membre="26" data-solution="13">
   Dans sa poche Roger a @1 billet de #20€ et @3 pièces de #2€. A la librairie elle achète @1 livre à $7€ et @2 stylos à $3€. Combien d’argent lui reste-t-il $?
   </div>
@@ -352,6 +353,5 @@
   Dans sa poche Clément a @2 billet de #20€ et @3 pièces de #2€. A la librairie elle achète @1 livre à $7€ et @2 stylos à $3€. Combien d’argent lui reste-t-il $?
   </div>
   
-
 </body>
 </html>
