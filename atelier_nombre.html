@@ -171,9 +171,6 @@
     box-shadow: none;
   }
   
-  .enonce{
-    position:absolute;
-  }  
   </style>
   
   <script type="text/coffeescript">
@@ -188,7 +185,6 @@
   # Fonction permettant d'inserer un exo dans l'enoncé
   choisir_exo = (id) ->
     $( ".carte" ).remove()
-    $( "#enonce" ).dialog( "destroy" )
     exo = $( "##{id}" )
     membre = exo.data( "membre" )
     solution = exo.data( "solution" )
@@ -200,7 +196,11 @@
       .replace(/@([0-9]*\??)/g, "<div class='carte arobas'>$1</div>" )
 
     # On Fabrique un énoncé avec des elements (uniques) de chaque membre de l'équation draggables
-    $('#enonce').empty().prepend("<div class='enonce'>#{text}</div>")
+    $('#enonce')
+      .empty()
+      .append("<div class='enonce'>#{text}</div>")
+      .dialog
+        autoOpen: true
 
     # Les cartes de l'enoncé sont draggable et deviendront des items
     $('.carte').draggable
@@ -209,15 +209,16 @@
       appendTo: "#panel"
       containement: "#panel"
       zIndex: 10000
-    $( "#enonce" ).dialog()
+
       
   # On Dom Ready !   
   $ ->
     # Ouvrir les exos
     $( "#select_opener" ).click () -> $( "#exercices" ).selectmenu( "open" )
     # Configuration des boites de dialogue
-    $( "#parametres, #enonce" ).dialog
+    $( "#parametres" ).dialog
       autoOpen: false
+
     # Ouverture/fermeture des boites de dialogue
     $( "#param_opener" ).click () -> 
       isOpen = $( " #parametres" ).dialog( "isOpen" )
