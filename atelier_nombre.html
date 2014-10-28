@@ -116,10 +116,11 @@
     display: inline-block;
   }
   .item {
-    min-width:5%;
-    max-width: 5%;
-    min-height:10%;
-    max-height:10%;
+    min-width: 2em;
+    max-width: 2em;
+    min-height:2em;
+    max-height:2em;
+    line-height:2em;
     position : absolute;
     text-align: center;
     text-shadow: 0.04em 0.04em black;
@@ -176,6 +177,11 @@
   </style>
   
   <script type="text/coffeescript">
+  #Permettre aux boites de dialogues de sortir de l'ecran
+  $.ui.dialog.prototype._makeDraggable = () ->
+    this.uiDialog.draggable
+        containment: false
+
   # Variable globale membre=valeur d'un membre, solution=$? (l'inconnue)
   [membre, solution] = [0,0]
   
@@ -215,7 +221,11 @@
       width: "50%"
       height: 400
     # Ouverture/fermeture des boites de dialogue
-    $( "#param_opener" ).click () -> $( "#parametres" ).dialog( "open" )
+    $( "#param_opener" ).click () -> 
+      isOpen = $( " #parametres" ).dialog( "isOpen" )
+      if isOpen
+        $( "#parametres" ).dialog( "close" )
+      else $( "#parametres" ).dialog( "open" )
     # Gestion des checkbox du menu user
     $(' #checkbox_aide ').change () -> 
       if $(this).is(":checked")
