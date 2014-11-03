@@ -18,10 +18,10 @@
     height:100%;
     position:relative; 
   }
-  .exercice, #enonce {
+   .ui-selectmenu-button, .exercice {
     display: none;
   }
- 
+  /* Planche en carton "panel contient panel_top et panel_bottom parfois ils sont rotate !*/
   #panel {
     position:absolute;
     background: no-repeat center url('planche_carton.jpg');
@@ -40,25 +40,33 @@
     right: 0;
     background: no-repeat center url('planche_carton_portrait.jpg');
     background-size: 100%;
-  }
-  
+  } 
   #panel_top.rotate, #panel_bottom.rotate {
     position: absolute;
-    width : 49%;
+    width : 49% !important;
     height : 100%;
 
   } 
   #panel_bottom.rotate {
     left:50%;
-
   } 
-  
+  .panel-hover {
+    background: none;
+    border:none;
+  }  
+  .panel-active {
+    background: rgba(0,0,0,0.25);
+    box-shadow: none;
+  } 
+  /* Menu de gauche - A revoir */
   #user_menu {
+    padding: 0.1em;
     position: fixed;
+    background: rgba(0,0,0, 0.25);
     min-width; 10%;
     max-width: 10%;
   }
-  .menu_item, .icon{
+  .menu_item, .icon {
     position: relative;
     display: block;
     min-width; 100%;
@@ -67,8 +75,19 @@
   .checkbox {
     width: 1.5em;
     height: 1.5em;
+  } 
+  .trash-hover {
+    color:red;
+    text-shadow: 0.03em 0.03em black;
+    background: rgba(255, 0, 0, 0.5);
+    border: none;
+  }
+  .trash-active {
+    background: none;
+    border : solid red 0.1em;
   }
   
+  /* Énoncé dialog jquery */
   #enonce {
     font-family: Ubuntu, sans-serif; 
     font-size : 25px;
@@ -82,17 +101,34 @@
     width: 1.25em;
     border: 0.05em solid black; 
     background: #FCB08B;
-    border-radius: 0.2em;  
+    border-radius: 0.2em; 
+    z-index: 5000;    
+    
   }
+  .ui-dialog-titlebar{
+    background: #FCB08B;
+    color: #622900;
+    font-size: 0.25em;
+  }
+  .ui-dialog .ui-dialog-content {
+    padding: 0px;
+  }
+  
+  /* items $, # et @ */
+ 
   .carte_panel {
     position: absolute;
-    background : #FCB08B;
     width: 2em;
     height: 2em;
     line-height: 2em;
+    
+    color: white;
+    text-shadow: -0.05em -0.05em 0px rgba(255,255,255,0.3), 0.05em 0.05em 0em rgba(0,0,0,0.8);
+    background : black;
+    box-shadow: 0em 0.2em 0.2em 0em black;
     font-family: Ubuntu, sans-serif; 
     font-size: 1.5em;
-    font-weight:bold;
+    font-weight:bolder;
     text-align: center;
     z-index: 10000;   
   }
@@ -104,52 +140,21 @@
     display: inline-block;
   }
   .arobas.aide {
-    box-shadow: 0em 0em 0.05em 0.05em red;
+    box-shadow: 0em 0.2em 0.2em 0em red;
   }
   .dollar.aide {
-    box-shadow: 0em 0em 0.05em 0.05em blue;
+    box-shadow: 0em 0.2em 0.2em 0em blue;
   }  
   .diese.aide {
-    box-shadow: 0em 0em 0.05em 0.05em yellow;
-  }
-  
-  #trash.ui-droppable.ui-state-hover {
-    color:red;
-    text-shadow: 0.03em 0.03em black;
-    background: rgba(255, 0, 0, 0.5);
-    border: none;
-  }
-  #trash.ui-droppable.ui-state-hover.ui-state-active {
-    background: none;
-    border : solid red 0.1em;
-  }
-  
-  .ui-selectmenu-button {
-    display: none;
-  }
-  .ui-dialog-titlebar{
-    background: #FCB08B;
-    color: #622900;
-    font-size: 0.25em;
-  }
-  .ui-dialog .ui-dialog-content {
-    padding: 0px;
-  }
-  .panel.ui-droppable.ui-state-hover {
-    background: none;
-    border:none;
+    box-shadow: 0em 0.2em 0.2em 0em yellow;
   }  
-  .panel.ui-droppable.ui-state-hover.ui-state-active {
-    background: rgba(0,0,0,0.25);
-    box-shadow: none;
-  } 
   </style>
   
   <script type="text/coffeescript">
   # Variable globale membre=valeur d'un membre, solution=$? (l'inconnue)
   [membre, solution] = [0,0]
   ######################################################################  
-  # Fonction permettant d'inserer un exo dans l'enoncé
+  # Fonction permettant d'inserer un exo dans #enonce
   ######################################################################  
   choisir_exo = (id) ->
     $( ".carte" ).remove()
@@ -163,14 +168,11 @@
       .replace(/\$([0-9]*\??)/g, "<div class='carte dollar'>$1</div>" )
       .replace(/@([0-9]*\??)/g, "<div class='carte arobas'>$1</div>" )
     # On Fabrique un énoncé avec des elements (uniques) de chaque membre de l'équation draggables
-    $('#enonce')
-      .empty()
-      .append("<div class='enonce'>#{text}</div>")
-      .dialog
-        position:
-          my: 'right bottom'
-          at: 'right bottom'
-          of: '#panel'
+    $('#enonce').empty().append("<div class='enonce'>#{text}</div>").dialog
+      position:
+        my: 'right bottom'
+        at: 'right bottom'
+        of: '#panel'
     # Prise en charge de la rotation du panel pour la boite de dialogue
     if $( "#panel" ).hasClass( "rotate")
       $('#enonce').dialog
@@ -186,11 +188,20 @@
       helper: "clone"
       appendTo: "#panel"
       containement: "#panel"
+   
   ######################################################################     
   # On Dom Ready !   
   ######################################################################  
   $ ->
-    # Ouvrir les exos
+    #Ajout des options pour le menu select à partir des div exercice
+    $( ".exercice" ).each ->
+      id = $( this ).attr("id")
+      html = "<option value='#{id}'>#{id}</option>"
+      $( "#exercices" ).append(html)
+    #Surcharge jquery du menu select
+    $( "#exercices" ).selectmenu
+      select: ( event, data ) -> choisir_exo( data.item.value )  
+    # Ouvrir les exos  
     $( "#select_opener" ).click () -> $( "#exercices" ).selectmenu( "open" )
     # Configuration de la boite de dialogue paramètre
     $( "#parametres" ).dialog
@@ -218,63 +229,46 @@
         $( "#panel, #panel_top, #panel_bottom" ).addClass( "rotate" )
       else
         $( "#panel, #panel_top, #panel_bottom" ).removeClass( "rotate" )
+    
     # On active la corbeille droppable
     $('#trash').droppable
       accept: ".carte_panel" 
       greedy:true
-      activeClass: "ui-state-hover"
-      hoverClass: "ui-state-active"
+      activeClass: "trash-hover"
+      hoverClass: "trash-active"
       over: (event, ui) -> ui.draggable.addClass( "remove" ).removeClass( "carte" )
       out: (event, ui) ->  ui.draggable.addClass( "carte" ).removeClass( "remove" )
       drop: (event,ui) ->  ui.draggable.remove()
+   
     # On active les panels droppable  
     $('#panel_top, #panel_bottom').droppable
       accept: ".carte" 
-      activeClass: "ui-state-hover"
-      hoverClass: "ui-state-active"
+      activeClass: "panel-hover"
+      hoverClass: "panel-active"
       drop: (event,ui) ->   
-        # Si c'est une carte_panel droppée dans un autre panel alors elle passe juste d'un panel à l'autre
+        #Fonction pour ajuster le drop d'une carte dans le panel
+        nice_drop = (draggable) => 
+          draggable.css
+              left: event.clientX - draggable.width()/2 - $( this ).position().left
+              top : event.clientY  - draggable.height() / 2 
+          $( this ).append draggable
+       
+        # Si c'est une carte_panel droppée dans un autre panel alors elle passe juste d'un panel à l'autre 
         if ui.draggable.hasClass("carte_panel")
-          $(this).append( $( ui.draggable ) ) 
-          #Gestion de la rotation et du placement exact ou la carte est droppé
-          topOffset = event.clientY  - $( ui.draggable ).height() / 2
-          if $( "#panel" ).hasClass( "rotate" )
-            leftOffset = event.clientX - $( ui.draggable ).width()/2 - $( this ).position().left
-            $(ui.draggable).css
-              left: leftOffset
-              top : topOffset
-           else
-            leftOffset = event.clientX - $( ui.draggable ).width() / 2
-            $(ui.draggable).css
-              left: leftOffset
-              top : topOffset     
-        # Sinon on crée une nouvelle carte_panel à partir du clone d'une carte de l'énoncé
+          nice_drop( ui.draggable )
         else
-          valeur = parseInt(ui.draggable.html())
+          clone = ui.draggable.clone() 
+          nice_drop( clone)
+          valeur = parseInt(clone.html())
           valeur = if isNaN(valeur) then solution else valeur
-          clone = $( ui.draggable ).clone() 
           clone.addClass("carte_panel").data( "valeur", valeur )
           if $( "#checkbox_aide" ).is(":checked")
-            $( clone ).addClass("aide")
-          $( this ).append $( clone )
-          #Gestion de la rotation et du placement exact ou la carte est droppé
-          topOffset = event.clientY  - $( clone ).height() / 2
-          if $( "#panel" ).hasClass( "rotate" )
-            leftOffset = event.clientX - $( clone ).width() / 2 - $( this ).position().left
-            $(clone).css
-              left: leftOffset
-              top : topOffset
-          else
-            leftOffset = event.clientX - $( clone ).width() / 2
-            $(clone).css
-              left: leftOffset
-              top : topOffset
-          # La carte_panel crée doit devenir draggable
-          $('.carte_panel').draggable
-            revert: "invalid"
-            cursor: "move"
-            tolerance: "fit"
-    
+            $( clone ).addClass("aide")          
+          # La carte_panel crée doit devenir draggable 
+          $( clone )
+            .draggable
+              revert: "invalid"
+              cursor: "move"           
     # L'utilisateur clique sur le bouton pour vérifier sa modélisation 
     $('#check').click () ->
       #Sommer les cartes d'un certains type d'un certain panel
@@ -294,20 +288,11 @@
         t = somme("#panel_top", ".diese")
         b = somme("#panel_bottom", ".dollar")
       # Roulement de tambour, si tout n'est pas mélangé que les sommes sont exactes qu'il n'y a pas de carte piège alors c'est bon!  
-      if t is b and t is membre and $( ".arobas.carte_panel" ).length is 0
+      if t is b and b is membre and $( ".arobas.carte_panel" ).length is 0
         alert "bravo !"
       else
-        alert "Essayes encore !"  
-    
-    #Ajout des options pour le menu menu select à partir des div exercice
-    $( ".exercice" ).each ->
-      id = $( this ).attr("id")
-      html = "<option value='#{id}'>#{id}</option>"
-      $( "#exercices" ).append(html)
-    #Surcharge jquery du menu select
-    $( "#exercices" ).selectmenu
-      select: ( event, data ) -> choisir_exo( data.item.value ) 
-      width: 400     
+        alert "Essayes encore !"    
+   
   </script>
 </head>
 
@@ -340,8 +325,7 @@
     <div id="trash"          class="menu_item"><img class="icon" src="https://cdn2.iconfinder.com/data/icons/flat-ui-icons-24-px/24/cross-24-128.png"></div>
     
     <div id="check"          class="menu_item"><img class="icon" src="https://cdn2.iconfinder.com/data/icons/flat-ui-icons-24-px/24/checkround-24-128.png"></div>
-  </div>    
-
+  </div>
   <!-- 
     Pour rajouter un exercice, il suffit de rajouter des divs en prenant soin de modifier l'id, les valeurs data-membre et data-solution et l'enoncé en respectant les conventions suivantes:
     @nombre = pieges
@@ -351,15 +335,15 @@
   --> 
   
   <div id="exo_1" class="exercice" data-membre="26" data-solution="13">
-  Dans sa poche Roger a @1 billet de #20€ et @3 pièces de #2€. A la librairie elle achète @1 livre à $7€ et @2 stylos à $3€. Combien d’argent lui reste-t-il $?
+  Dans sa poche Roger a 1 billet de #20€ et 3 pièces de #2€. A la librairie il achète 1 livre à $7€ et 2 stylos à $3€. Combien d’argent lui reste-t-il $?
   </div>
       
   <div id="exo_2" class="exercice" data-membre="22" data-solution="9">
-  Dans sa poche Paul a @1 billet de #20€ et @1 pièces de #2€. A la librairie elle achète @1 livre à $7€ et @2 stylos à $3€. Combien d’argent lui reste-t-il $?
+  Dann ti veston Paul, nenna 1 byé #20€ ek 1 pièss #2€. A la boutik, lissa rod 1 trin pou $7€ eksa 2 zafer pou $3€. Combien y restla mêm dann ti veston Paul $?
   </div>
       
   <div id="exo_3" class="exercice" data-membre="46" data-solution="33">
-  Dans sa poche Clément a @2 billet de #20€ et @3 pièces de #2€. A la librairie elle achète @1 livre à $7€ et @2 stylos à $3€. Combien d’argent lui reste-t-il $?
+  Dans sa poche Chloé a @2 billet de #20€ et @3 pièces de #2€. A la librairie elle achète @1 livre à $7€ et @2 stylos à $3€. Je ne le dirais pas @20 fois ni @7 ! Combien d’argent lui reste-t-il $?
   </div>
   
 </body>
