@@ -4,327 +4,43 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Modéliser un problème</title>
+  <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css" />
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Ubuntu:regular,bold&subset=Latin" />
+  <link rel="stylesheet" href="css/main.css" />
   <script src="http://cdnjs.cloudflare.com/ajax/libs/coffee-script/1.7.1/coffee-script.min.js"></script>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
   <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
-  <script src="http://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script> 
-  <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css" />
-  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Ubuntu:regular,bold&subset=Latin" />
-  <style type="text/css">
-  html, body, #user, #panel {
-    margin:0;
-    padding:0;
-    width: 100%;
-    height:100%;
-    position:relative; 
-  }
-   .ui-selectmenu-button, .exercice {
-    display: none;
-  }
-  /* Planche en carton "panel contient panel_top et panel_bottom parfois ils sont rotate !*/
-  #panel {
-    position:absolute;
-    background: no-repeat center url('planche_carton.jpg');
-    background-size: 100%;   
-  }
-  #panel_top, #panel_bottom { 
-    width:100%;
-    height : 50%;  
-  }
-  #panel.rotate {
-    position:absolute;
-    position: absolute;
-    margin-left: auto;
-    margin-right: auto;
-    left: 0;
-    right: 0;
-    background: no-repeat center url('planche_carton_portrait.jpg');
-    background-size: 100%;
-  } 
-  #panel_top.rotate, #panel_bottom.rotate {
-    position: absolute;
-    width : 49% !important;
-    height : 100%;
-
-  } 
-  #panel_bottom.rotate {
-    left:50%;
-  } 
-  .panel-hover {
-    background: none;
-    border:none;
-  }  
-  .panel-active {
-    background: rgba(0,0,0,0.25);
-    box-shadow: none;
-  } 
-  /* Menu de gauche - A revoir */
-  #user_menu {
-    padding: 0.1em;
-    position: fixed;
-    background: rgba(0,0,0, 0.25);
-    min-width; 10%;
-    max-width: 10%;
-  }
-  .menu_item, .icon {
-    position: relative;
-    display: block;
-    min-width; 100%;
-    max-width: 100%;
-  }
-  .checkbox {
-    width: 1.5em;
-    height: 1.5em;
-  } 
-  .trash-hover {
-    color:red;
-    text-shadow: 0.03em 0.03em black;
-    background: rgba(255, 0, 0, 0.5);
-    border: none;
-  }
-  .trash-active {
-    background: none;
-    border : solid red 0.1em;
-  }
-  
-  /* Énoncé dialog jquery */
-  #enonce {
-    font-family: Ubuntu, sans-serif; 
-    font-size : 25px;
-    margin: 0.1em;
-  }
-  .carte {
-    display: inline-block;
-    font-family: Ubuntu, sans-serif; 
-    font-weight:bold;
-    text-align: center;
-    width: 1.25em;
-    border: 0.05em solid black; 
-    background: #FCB08B;
-    border-radius: 0.2em; 
-    z-index: 5000;    
-    
-  }
-  .ui-dialog-titlebar{
-    background: #FCB08B;
-    color: #622900;
-    font-size: 0.25em;
-  }
-  .ui-dialog .ui-dialog-content {
-    padding: 0px;
-  }
-  
-  /* items $, # et @ */
- 
-  .carte_panel {
-    position: absolute;
-    width: 2em;
-    height: 2em;
-    line-height: 2em;
-    
-    color: white;
-    text-shadow: -0.05em -0.05em 0px rgba(255,255,255,0.3), 0.05em 0.05em 0em rgba(0,0,0,0.8);
-    background : black;
-    box-shadow: 0em 0.2em 0.2em 0em black;
-    font-family: Ubuntu, sans-serif; 
-    font-size: 1.5em;
-    font-weight:bolder;
-    text-align: center;
-    z-index: 10000;   
-  }
-  .remove{
-    background: rgba(255, 0, 0, 0.5);
-    
-  }
-  .arobas {
-    display: inline-block;
-  }
-  .arobas.aide {
-    box-shadow: 0em 0.2em 0.2em 0em red;
-  }
-  .dollar.aide {
-    box-shadow: 0em 0.2em 0.2em 0em blue;
-  }  
-  .diese.aide {
-    box-shadow: 0em 0.2em 0.2em 0em yellow;
-  }  
-  </style>
-  
-  <script type="text/coffeescript">
-  # Variable globale membre=valeur d'un membre, solution=$? (l'inconnue)
-  [membre, solution] = [0,0]
-  ######################################################################  
-  # Fonction permettant d'inserer un exo dans #enonce
-  ######################################################################  
-  choisir_exo = (id) ->
-    $( ".carte" ).remove()
-    exo = $( "##{id}" )
-    membre = exo.data( "membre" )
-    solution = exo.data( "solution" )
-    # On parse le texte a la recherche des $ et des # qui symbolisent les items de chacun des membres de l'équation
-    text = exo
-      .text()
-      .replace(/#([0-9]*\??)/g, "<div class='carte diese'>$1</div>" )
-      .replace(/\$([0-9]*\??)/g, "<div class='carte dollar'>$1</div>" )
-      .replace(/@([0-9]*\??)/g, "<div class='carte arobas'>$1</div>" )
-    # On Fabrique un énoncé avec des elements (uniques) de chaque membre de l'équation draggables
-    $('#enonce').empty().append("<div class='enonce'>#{text}</div>").dialog
-      position:
-        my: 'right bottom'
-        at: 'right bottom'
-        of: '#panel'
-    # Prise en charge de la rotation du panel pour la boite de dialogue
-    if $( "#panel" ).hasClass( "rotate")
-      $('#enonce').dialog
-        width: $(window).width() * 1
-        height: $(window).height() * 0.3   
-    else
-      $('#enonce').dialog
-        width: $(window).width() * 0.25
-        height: $(window).height() * 1
-    # Les cartes de l'enoncé sont draggable et deviendront des carte_panels
-    $('.carte').draggable
-      revert: "invalid"
-      helper: "clone"
-      appendTo: "#panel"
-      containement: "#panel"
-   
-  ######################################################################     
-  # On Dom Ready !   
-  ######################################################################  
-  $ ->
-    #Ajout des options pour le menu select à partir des div exercice
-    $( ".exercice" ).each ->
-      id = $( this ).attr("id")
-      html = "<option value='#{id}'>#{id}</option>"
-      $( "#exercices" ).append(html)
-    #Surcharge jquery du menu select
-    $( "#exercices" ).selectmenu
-      select: ( event, data ) -> choisir_exo( data.item.value )  
-    # Ouvrir les exos  
-    $( "#select_opener" ).click () -> $( "#exercices" ).selectmenu( "open" )
-    # Configuration de la boite de dialogue paramètre
-    $( "#parametres" ).dialog
-      autoOpen: false
-    # Ouverture/fermeture de la boite de dialogue
-    $( "#param_opener" ).click () -> 
-      isOpen = $( " #parametres" ).dialog( "isOpen" )
-      if isOpen
-        $( "#parametres" ).dialog( "close" )
-      else $( "#parametres" ).dialog( "open" )
-    # Gestion des checkbox de la boite de dialogue paramètre
-    $(' #checkbox_aide ').change () -> 
-      if $(this).is(":checked")
-        $( ".carte_panel" ).addClass( "aide" )
-      else
-        $( ".carte_panel" ).removeClass( "aide" )
-    $(' #checkbox_piege ').change () -> 
-      if $(this).is(":checked")
-        $( ".arobas" ).addClass( "carte" ).draggable('enable')
-      else
-        $( ".arobas.carte_panel" ).remove()
-        $( ".arobas" ).draggable('disable').removeClass( "carte" )
-    $(' #checkbox_rotate ').change () -> 
-      if $(this).is(":checked")
-        $( "#panel, #panel_top, #panel_bottom" ).addClass( "rotate" )
-      else
-        $( "#panel, #panel_top, #panel_bottom" ).removeClass( "rotate" )
-    
-    # On active la corbeille droppable
-    $('#trash').droppable
-      accept: ".carte_panel" 
-      greedy:true
-      activeClass: "trash-hover"
-      hoverClass: "trash-active"
-      over: (event, ui) -> ui.draggable.addClass( "remove" ).removeClass( "carte" )
-      out: (event, ui) ->  ui.draggable.addClass( "carte" ).removeClass( "remove" )
-      drop: (event,ui) ->  ui.draggable.remove()
-   
-    # On active les panels droppable  
-    $('#panel_top, #panel_bottom').droppable
-      accept: ".carte" 
-      activeClass: "panel-hover"
-      hoverClass: "panel-active"
-      drop: (event,ui) ->   
-        #Fonction pour ajuster le drop d'une carte dans le panel
-        nice_drop = (draggable) => 
-          draggable.css
-              left: event.clientX - draggable.width()/2 - $( this ).position().left
-              top : event.clientY  - draggable.height() / 2 
-          $( this ).append draggable
-       
-        # Si c'est une carte_panel droppée dans un autre panel alors elle passe juste d'un panel à l'autre 
-        if ui.draggable.hasClass("carte_panel")
-          nice_drop( ui.draggable )
-        else
-          clone = ui.draggable.clone() 
-          nice_drop( clone)
-          valeur = parseInt(clone.html())
-          valeur = if isNaN(valeur) then solution else valeur
-          clone.addClass("carte_panel").data( "valeur", valeur )
-          if $( "#checkbox_aide" ).is(":checked")
-            $( clone ).addClass("aide")          
-          # La carte_panel crée doit devenir draggable 
-          $( clone )
-            .draggable
-              revert: "invalid"
-              cursor: "move"           
-    # L'utilisateur clique sur le bouton pour vérifier sa modélisation 
-    $('#check').click () ->
-      #Sommer les cartes d'un certains type d'un certain panel
-      somme = ( panel, classe) ->
-        s = 0
-        selector = "#{panel} > #{classe}"
-        $( selector ).each ->
-          s += $( this ).data( "valeur" )
-        return s
-      # Quel est le type de la premiere carte du panel en haut
-      dollar_en_haut = $( '#panel_top div:first-child' ).hasClass("dollar")
-      if dollar_en_haut
-        t = somme("#panel_top", ".dollar")
-        b = somme("#panel_bottom", ".diese")
-      # Du coup cela définit un peu tout le reste !  
-      else
-        t = somme("#panel_top", ".diese")
-        b = somme("#panel_bottom", ".dollar")
-      # Roulement de tambour, si tout n'est pas mélangé que les sommes sont exactes qu'il n'y a pas de carte piège alors c'est bon!  
-      if t is b and b is membre and $( ".arobas.carte_panel" ).length is 0
-        alert "bravo !"
-      else
-        alert "Essayes encore !"    
-   
-  </script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+  <script type="text/javascript" src="scripts/main.js"></script>
 </head>
 
 <body> 
-
   <div id="panel" class="">
     <div id="panel_top" class="panel"></div>
     <div id="panel_bottom" class="panel"></div>
+    <div id="enonce" title="Énoncé"></div>
   </div> 
   
-  <div id="enonce" title="Énoncé">Choisir un exercice !</div>
-  
   <div id="user_menu">
-    <div id="select_opener" class="menu_item">
-      <img class="icon" src="https://cdn2.iconfinder.com/data/icons/flat-ui-icons-24-px/24/menu-24-128.png">
-      <select name="Exercices" id="exercices">
-          <option selected="selected">Choisir un exo</option>
-      </select>
+    <div id="select_opener" class="menu_item">&nbsp;
+      <select name="Exercices" id="exercices"></select>
+      
     </div>
     
-    <div id="param_opener"   class="menu_item">
-      <img class="icon" src="https://cdn2.iconfinder.com/data/icons/flat-ui-icons-24-px/24/settings-24-128.png">
+    <div id="menu_parametres" class="menu_item">&nbsp;
       <div id="parametres" title="Paramètres">
-        <input type="checkbox" id="checkbox_aide" class="checkbox"  />Aide<br>
-        <input type="checkbox" id="checkbox_piege" class="checkbox" checked/>Pièges<br>
-        <input type="checkbox" id="checkbox_rotate" class="checkbox"  />Tourner<br>
+        <label for="checkbox_aide">Aide</label>
+        <input type="checkbox" id="checkbox_aide" class="checkbox"  />
+        <label for="checkbox_piege">Pièges</label>
+        <input type="checkbox" id="checkbox_piege" class="checkbox" checked/>
+        <label for="checkbox_rotate">Tourner</label>
+        <input type="checkbox" id="checkbox_rotate" class="checkbox"  />
       </div>
     </div>
     
-    <div id="trash"          class="menu_item"><img class="icon" src="https://cdn2.iconfinder.com/data/icons/flat-ui-icons-24-px/24/cross-24-128.png"></div>
+    <div id="trash" class="menu_item">&nbsp;</div>
     
-    <div id="check"          class="menu_item"><img class="icon" src="https://cdn2.iconfinder.com/data/icons/flat-ui-icons-24-px/24/checkround-24-128.png"></div>
+    <div id="check" class="menu_item">&nbsp;</div>
   </div>
   <!-- 
     Pour rajouter un exercice, il suffit de rajouter des divs en prenant soin de modifier l'id, les valeurs data-membre et data-solution et l'enoncé en respectant les conventions suivantes:
@@ -333,6 +49,10 @@
     $nombre = item de l'autre membre
     $? ou (exclusif) #? = inconnue à trouver
   --> 
+  
+  <div id="exo_0" class="exercice" data-membre="4" data-solution="1">
+  Dans sa poche Roger a 4 jetons #1. A la librairie il achète 3 cartes valant chacune $1. Combien d’argent lui reste-t-il $?
+  </div>
   
   <div id="exo_1" class="exercice" data-membre="26" data-solution="13">
   Dans sa poche Roger a 1 billet de #20€ et 3 pièces de #2€. A la librairie il achète 1 livre à $7€ et 2 stylos à $3€. Combien d’argent lui reste-t-il $?

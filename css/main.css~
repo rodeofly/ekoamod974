@@ -1,0 +1,148 @@
+html, body, #user, #panel {
+  margin:0;
+  padding:0;
+  width: 100%;
+  height:100%;
+  position:relative; 
+}
+ .ui-selectmenu-button, .exercice {
+  display: none;
+}
+/* Planche en carton "panel contient panel_top et panel_bottom parfois ils sont rotate !*/
+#panel {
+  position:absolute;
+  background: no-repeat center url('images/planche_carton.jpg');
+  background-size: 100%;   
+}
+#panel_top, #panel_bottom { 
+  width:100%;
+  height : 50%;  
+}
+#panel.rotate {
+  position:absolute;
+  position: absolute;
+  margin-left: auto;
+  margin-right: auto;
+  left: 0;
+  right: 0;
+  background: no-repeat center url('images/planche_carton_portrait.jpg');
+  background-size: 100%;
+} 
+#panel_top.rotate, #panel_bottom.rotate {
+  position: absolute;
+  width : 49% !important;
+  height : 100%;
+
+} 
+#panel_bottom.rotate {
+  left:50%;
+} 
+.panel-hover {
+  background: none;
+  border:none;
+}  
+.panel-active {
+  background: rgba(0,0,0,0.0);
+  box-shadow: none;
+} 
+/* Menu de gauche - A revoir */
+#user_menu {
+  position: fixed;
+  background: rgba(0,0,0, 0.25);
+  width:10%;
+  height: 100%;
+}
+#select_opener {
+  background : no-repeat center url("https://cdn2.iconfinder.com/data/icons/flat-ui-icons-24-px/24/menu-24-128.png");
+  background-size: 100%;
+}
+#menu_parametres {
+  background : no-repeat center url("https://cdn2.iconfinder.com/data/icons/flat-ui-icons-24-px/24/settings-24-128.png");
+  background-size: 100%;
+}
+#trash {
+  background : no-repeat center url("https://cdn2.iconfinder.com/data/icons/flat-ui-icons-24-px/24/cross-24-128.png");
+  background-size: 100%;
+}
+#check {
+  background : no-repeat center url("https://cdn2.iconfinder.com/data/icons/flat-ui-icons-24-px/24/checkround-24-128.png");
+  background-size: 100%;
+}
+
+.menu_item, .icon {
+  position: relative;
+  display: block;
+  height: 25%;
+  width: 100%;
+} 
+.trash-hover {
+  color:red;
+  text-shadow: 0.03em 0.03em black;
+  background: rgba(255, 0, 0, 0.5);
+  border: none;
+}
+.trash-active {
+  background: none;
+  border : solid red 0.1em;
+}
+
+/* Énoncé dialog jquery */
+#enonce {
+  font-family: Ubuntu, sans-serif; 
+  font-size : 25px;
+  margin: 0.1em;
+}
+.carte {
+  display: inline-block;
+  font-family: Ubuntu, sans-serif; 
+  font-weight:bold;
+  text-align: center;
+  width: 1.25em;
+  border: 0.05em solid black; 
+  background: #FCB08B;
+  border-radius: 0.2em; 
+  z-index: 10000;
+  
+}
+.ui-dialog-titlebar{
+  background: #FCB08B;
+  color: #622900;
+  font-size: 0.25em;
+}
+.ui-dialog .ui-dialog-content {
+  padding: 0px;
+}
+
+/* items $, # et @ */
+
+.carte_panel {
+  position: absolute;
+  width: 2em;
+  height: 2em;
+  line-height: 2em;
+  
+  color: white;
+  text-shadow: -0.05em -0.05em 0px rgba(255,255,255,0.3), 0.05em 0.05em 0em rgba(0,0,0,0.8);
+  background : black;
+  box-shadow: 0em 0.2em 0.2em 0em black;
+  font-family: Ubuntu, sans-serif; 
+  font-size: 1.5em;
+  font-weight:bolder;
+  text-align: center;
+}
+.remove{
+  background: rgba(255, 0, 0, 0.5);
+  
+}
+.arobas {
+  display: inline-block;
+}
+.arobas.aide {
+  box-shadow: 0em 0.2em 0.2em 0em red;
+}
+.dollar.aide {
+  box-shadow: 0em 0.2em 0.2em 0em blue;
+}  
+.diese.aide {
+  box-shadow: 0em 0.2em 0.2em 0em yellow;
+}  
